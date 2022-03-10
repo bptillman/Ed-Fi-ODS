@@ -18,7 +18,7 @@ jobs:
         dotnet-version: 6.0.x
     - name: build
       run: |
-        \build.ps1 build -Configuration ${{ env.CONFIGURATION }} -InformationalVersion ${{ env.InformationalVersion}} -BuildCounter ${{ github.run_number }}
+        .\build.ps1 build -Configuration ${{ env.CONFIGURATION }} -InformationalVersion ${{ env.InformationalVersion}} -BuildCounter ${{ github.run_number }}
       shell: pwsh
     - name: test
       run: |
@@ -26,5 +26,5 @@ jobs:
       shell: pwsh
     - name: build
       run: |
-        ./build.ps1 pack -InformationalVersion ${{ env.InformationalVersion }} -BuildCounter ${{ github.run_number }}
+        .\build.ps1 pack -InformationalVersion ${{ env.InformationalVersion }} -BuildCounter ${{ github.run_number }}
       shell: pwsh 
