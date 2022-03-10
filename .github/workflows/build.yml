@@ -26,5 +26,5 @@ jobs:
       shell: pwsh
     - name: build
       run: |
-        ./build.ps1 pack
-      shell: pwsh -InformationalVersion ${{ env.InformationalVersion }} -BuildCounter ${{ github.run_number }}
+        ./build.ps1 pack -InformationalVersion ${{ env.InformationalVersion }} -BuildCounter ${{ github.run_number }}
+      shell: pwsh 

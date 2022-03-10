@@ -27,13 +27,10 @@ param(
 )
 
 $solution = "Application\EdFi.Admin.DataAccess\EdFi.Admin.DataAccess.sln"
+$projectFile = "Application\EdFi.Admin.DataAccess\EdFi.Admin.DataAccess.csproj"
 Import-Module -Name ("$PSScriptRoot/eng/build-helpers.psm1") -Force
 $version = "$InformationalVersion.$BuildCounter"
-
-& dotnet build .\Application\EdFi.Admin.DataAccess\EdFi.Admin.DataAccess.sln --configuration Release -p:AssemblyVersion=$env:informationalVersion.$env:version -p:FileVersion=$env:informationalVersion.$env:version -p:InformationalVersion=$env:informationalVersion
-& dotnet test .\Application\EdFi.Admin.DataAccess\EdFi.Admin.DataAccess.sln --configuration Release --no-build --verbosity normal
-& dotnet pack .\Application\EdFi.Admin.DataAccess\EdFi.Admin.DataAccess.csproj --configuration Release --no-build --verbosity normal -p:VersionPrefix=$env:informationalVersion.$env:version -p:NoWarn=NU5123 -p:PackageId=EdFi.Suite3.Admin.DataAccess
-
+$packageName = "EdFi.Suite3.Admin.DataAccess"
 
 function Invoke-Execute {
     param (
@@ -73,6 +70,12 @@ function Compile {
         dotnet build $solution -c $Configuration -p:AssemblyVersion=$version -p:FileVersion=$version -p:InformationalVersion=$InformationalVersion
     }
 }
+
+function Pack {
+    Invoke-Execute {
+        dotnet pack $projectFile -c $Configuration --no-build --verbosity normal -p:VersionPrefix=$version -p:NoWarn=NU5123 -p:PackageId=$packageName
+    }
+}
 function Invoke-Build {
     Write-Host "Building Version $version" -ForegroundColor Cyan
     Invoke-Step { Clean }
@@ -82,6 +85,10 @@ function Invoke-Build {
 
 function Invoke-Tests {
     Invoke-Execute { dotnet test $solution  -c $Configuration --no-build -v normal }
+}
+
+function Invoke-Pack {
+    Invoke-Step { Pack }
 }
 
 Invoke-Main {
