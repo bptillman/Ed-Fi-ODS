@@ -95,15 +95,18 @@ function Pack {
         dotnet pack $projectFile -c $Configuration --no-build --verbosity normal -p:VersionPrefix=$version -p:NoWarn=NU5123 -p:PackageId=$packageName
     }
 }
+
+function Test {
+    Invoke-Execute { dotnet test $solution  -c $Configuration --no-build -v normal }
+}
 function Invoke-Build {
     Write-Host "Building Version $version" -ForegroundColor Cyan
     Invoke-Step { Clean }
     Invoke-Step { Compile }
-    Invoke-Step { Test }
 }
 
 function Invoke-Tests {
-    Invoke-Execute { dotnet test $solution  -c $Configuration --no-build -v normal }
+    Invoke-Step { Test }
 }
 
 function Invoke-Pack {
