@@ -4,7 +4,7 @@ on: [push]
 
 env:
   informationalVersion: "1.0"
-  version: "$informationalVersion.${{ github.run_number }}"
+  version: "${{ github.run_number }}"
 
 jobs:
   build:
