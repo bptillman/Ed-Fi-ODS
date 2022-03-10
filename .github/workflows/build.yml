@@ -1,0 +1,26 @@
+name: .NET
+
+on: [push]
+
+env:
+  version: "1.0.${{ github.run_number }}"
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build .\Application\EdFi.Admin.DataAccess\EdFi.Admin.DataAccess.sln --configuration Release --no-restore
+    - name: Test
+      run: dotnet test .\Application\EdFi.Admin.DataAccess\EdFi.Admin.DataAccess.sln --configuration Release --no-build --verbosity normal
+    - name: Pack
+      run: dotnet pack .\Application\EdFi.Admin.DataAccess\EdFi.Admin.DataAccess.sln --configuration Release --no-build --verbosity normal -p:VersionPrefix=$env:version -p:NoWarn=NU5123 -p:PackageId=EdFi.Suite3.Admin.DataAccess
