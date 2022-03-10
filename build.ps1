@@ -7,7 +7,7 @@
 param(
     # Command to execute, defaults to "Build".
     [string]
-    [ValidateSet("Clean", "Build", "Test")]
+    [ValidateSet("Clean", "Build", "Test", "Pack")]
     $Command = "Build",
 
     [switch] $SelfContained,
