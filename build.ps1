@@ -7,7 +7,7 @@
 param(
     # Command to execute, defaults to "Build".
     [string]
-    [ValidateSet("Clean", "Build", "Test", "Pack")]
+    [ValidateSet("Clean", "Build", "Test", "Pack", "Publish")]
     $Command = "Build",
 
     [switch] $SelfContained,
@@ -30,6 +30,8 @@ $solution = "Application\EdFi.Admin.DataAccess\EdFi.Admin.DataAccess.sln"
 $projectFile = "Application\EdFi.Admin.DataAccess\EdFi.Admin.DataAccess.csproj"
 $version = "$InformationalVersion.$BuildCounter"
 $packageName = "EdFi.Suite3.Admin.DataAccess"
+$packageOutput = "NugetPackages"
+$packagePath = ".\$packageOutput\$packageName.$version.nupkg"
 
 function Invoke-Execute {
     param (
@@ -92,17 +94,28 @@ function Compile {
 
 function Pack {
     Invoke-Execute {
-        dotnet pack $projectFile -c $Configuration --no-build --verbosity normal -p:VersionPrefix=$version -p:NoWarn=NU5123 -p:PackageId=$packageName
+        dotnet pack $projectFile -c $Configuration --output $packageOutput --no-build --verbosity normal -p:VersionPrefix=$version -p:NoWarn=NU5123 -p:PackageId=$packageName
+    }
+}
+
+function Publish {
+    Invoke-Execute {
+        dotnet nuget push $packagePath -s $env:AZURE_ARTIFACT_URL -k $env:AZURE_ARTIFACT_NUGET_KEY --force-english-output
     }
 }
 
 function Test {
     Invoke-Execute { dotnet test $solution  -c $Configuration --no-build -v normal }
 }
+
 function Invoke-Build {
     Write-Host "Building Version $version" -ForegroundColor Cyan
     Invoke-Step { Clean }
     Invoke-Step { Compile }
+}
+
+function Invoke-Publish {
+    Invoke-Step { Publish }
 }
 
 function Invoke-Tests {
@@ -119,6 +132,7 @@ Invoke-Main {
         Build { Invoke-Build }
         Test { Invoke-Tests }
         Pack { Invoke-Pack }
+        Publish { Invoke-Publish }
         default { throw "Command '$Command' is not recognized" }
     }
 }
