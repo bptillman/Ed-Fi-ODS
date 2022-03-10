@@ -59,6 +59,26 @@ function Invoke-Step {
     &$block
 }
 
+function Invoke-Main {
+    param (
+        [ScriptBlock]
+        $MainBlock
+    )
+
+    try {
+        &$MainBlock
+        Write-Host
+        Write-Host "Build Succeeded" -fore GREEN
+        exit 0
+    } catch [Exception] {
+        Write-Host
+        Write-Error $_.Exception.Message
+        Write-Host
+        Write-Error "Build Failed"
+        exit 1
+    }
+}
+
 function Clean {
     Invoke-Execute { dotnet clean $solution -c $Configuration --nologo -v minimal }
 }
