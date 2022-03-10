@@ -26,12 +26,12 @@ param(
     $Configuration = "Release"
 )
 
-$solution = "Application\EdFi.Admin.DataAccess\EdFi.Admin.DataAccess.sln"
-$projectFile = "Application\EdFi.Admin.DataAccess\EdFi.Admin.DataAccess.csproj"
+$solution = "Application/EdFi.Admin.DataAccess/EdFi.Admin.DataAccess.sln"
+$projectFile = "Application/EdFi.Admin.DataAccess/EdFi.Admin.DataAccess.csproj"
 $version = "$InformationalVersion.$BuildCounter"
 $packageName = "EdFi.Suite3.Admin.DataAccess"
-$packageOutput = "NugetPackages"
-$packagePath = ".\$packageOutput\$packageName.$version.nupkg"
+$packageOutput = "$PSScriptRoot/NugetPackages"
+$packagePath = "$packageOutput/$packageName.$version.nupkg"
 
 function Invoke-Execute {
     param (
