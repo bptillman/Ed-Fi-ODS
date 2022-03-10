@@ -4,7 +4,6 @@ on: [push]
 
 env:
   informationalVersion: "1.0"
-  version: "${{ github.run_number }}"
 
 jobs:
   build:
@@ -18,4 +17,14 @@ jobs:
       with:
         dotnet-version: 6.0.x
     - name: build
-      run: pwsh ./build.ps1
+      run: |
+        \build.ps1 build -Configuration ${{ env.CONFIGURATION }} -InformationalVersion ${{ env.InformationalVersion}} -BuildCounter ${{ github.run_number }}
+      shell: pwsh
+    - name: test
+      run: |
+        .\build.ps1 test -Configuration ${{ env.CONFIGURATION }}
+      shell: pwsh
+    - name: build
+      run: |
+        ./build.ps1 pack
+      shell: pwsh -InformationalVersion ${{ env.InformationalVersion }} -BuildCounter ${{ github.run_number }}
