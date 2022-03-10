@@ -28,7 +28,6 @@ param(
 
 $solution = "Application\EdFi.Admin.DataAccess\EdFi.Admin.DataAccess.sln"
 $projectFile = "Application\EdFi.Admin.DataAccess\EdFi.Admin.DataAccess.csproj"
-Import-Module -Name ("$PSScriptRoot/eng/build-helpers.psm1") -Force
 $version = "$InformationalVersion.$BuildCounter"
 $packageName = "EdFi.Suite3.Admin.DataAccess"
 
