@@ -4,6 +4,7 @@ on: [push]
 
 env:
   informationalVersion: "1.0"
+  CONFIGURATION: "Release"
 
 jobs:
   build:
