@@ -1,6 +1,13 @@
 name: .NET
 
-on: [push]
+on:
+  push:
+    branches:
+    - main
+    - ODS-5303
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       logLevel:
