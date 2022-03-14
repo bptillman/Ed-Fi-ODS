@@ -10,13 +10,6 @@ on:
 
 jobs:
   call-shared-workflow:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: checkfolder
-      run: |
-        ls /home/runner/work/Ed-Fi-ODS/Ed-Fi-ODS/.github/workflows
-      shell: pwsh
-    - uses: ./.github/workflows/action.yml
-      with:
-        publish: true
+    uses: ./.github/workflows/action.yml
+    with:
+      publish: true
