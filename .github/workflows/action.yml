@@ -34,12 +34,12 @@ jobs:
         .\build.ps1 test -Configuration ${{ env.CONFIGURATION }}
       shell: pwsh
     - name: pack
-      if: ${{publish == true}}
+      if: ${{inputs.publish == true}}
       run: |
         .\build.ps1 pack -InformationalVersion ${{ env.INFORMATIONAL_VERSION }} -BuildCounter ${{ github.run_number }}
       shell: pwsh
     - name: publish
-      if: ${{publish == true}}
+      if: ${{inputs.publish == true}}
       run: |
         .\build.ps1 publish -BuildCounter ${{ github.run_number }}
       shell: pwsh      
