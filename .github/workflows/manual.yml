@@ -12,8 +12,7 @@ jobs:
   call-shared-workflow:
     runs-on: ubuntu-latest
     steps:
-    - name: checkout
-      uses: actions/checkout@v2
+    - uses: actions/checkout@v2
     - uses: ./.github/workflows/shared.yml
       with:
         publish: true
