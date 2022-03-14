@@ -41,5 +41,5 @@ jobs:
     - name: publish
       if: ${{inputs.publish == true}}
       run: |
-        .\build.ps1 publish -BuildCounter ${{ github.run_number }}
+        .\build.ps1 publish -InformationalVersion ${{ env.INFORMATIONAL_VERSION }} -BuildCounter ${{ github.run_number }}
       shell: pwsh      
