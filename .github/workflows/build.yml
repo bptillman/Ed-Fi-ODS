@@ -1,43 +1,19 @@
-name: .NET
+name: Pull request build and test
 
 on:
-  workflow_dispatch:
-    inputs:
-      logLevel:
-        description: 'Log level'
-        required: true
-        default: 'warning'
+  pull_request:
+    branches: [ main ]
 
 env:
-  INFORMATIONAL_VERSION: "1.0"
+  INFORMATIONAL_VERSION: "5.4"
   CONFIGURATION: "Release"
   AZURE_ARTIFACT_URL: "https://pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/nuget/v3/index.json"
-  AZURE_ARTIFACT_NUGET_KEY: ${{ secrets.AZURE_ARTIFACT_KEY }}
+  AZURE_ARTIFACT_NUGET_KEY: ${{ secrets.AZURE_ARTIFACTS_PERSONAL_ACCESS_TOKEN }}
 
 jobs:
-  build:
-
+  call-shared-workflow:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+    - uses: ./github/workflows/shared
       with:
-        dotnet-version: 6.0.x
-    - name: build
-      run: |
-        .\build.ps1 build -Configuration ${{ env.CONFIGURATION }} -InformationalVersion ${{ env.INFORMATIONAL_VERSION}} -BuildCounter ${{ github.run_number }}
-      shell: pwsh
-    - name: test
-      run: |
-        .\build.ps1 test -Configuration ${{ env.CONFIGURATION }}
-      shell: pwsh
-    - name: pack
-      run: |
-        .\build.ps1 pack -InformationalVersion ${{ env.INFORMATIONAL_VERSION }} -BuildCounter ${{ github.run_number }}
-      shell: pwsh
-    - name: publish
-      run: |
-        .\build.ps1 publish -BuildCounter ${{ github.run_number }}
-      shell: pwsh
+        publish: false
