@@ -14,6 +14,6 @@ jobs:
   call-shared-workflow:
     runs-on: ubuntu-latest
     steps:
-    - uses: ./github/workflows/shared
+    - uses: ./github/workflows/shared.yml
       with:
         publish: false
