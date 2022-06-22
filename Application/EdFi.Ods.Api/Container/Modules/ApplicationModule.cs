@@ -170,14 +170,18 @@ namespace EdFi.Ods.Api.Container.Modules
                 .As<ITokenRequestProvider>()
                 .SingleInstance();
 
-            builder.RegisterType<OAuthTokenValidator>()
-                .As<IOAuthTokenValidator>()
+            builder.RegisterType<ApiClientDetailsProvider>()
+                .As<IApiClientDetailsProvider>()
                 .SingleInstance();
 
-            builder.RegisterDecorator<CachingOAuthTokenValidatorDecorator, IOAuthTokenValidator>();
+            builder.RegisterType<ApiClientDetailsCacheKeyProvider>()
+                .As<IApiClientDetailsCacheKeyProvider>()
+                .SingleInstance();
+            
+            builder.RegisterDecorator<CachingApiClientDetailsProviderDecorator, IApiClientDetailsProvider>();
 
-            builder.RegisterType<AuthenticationProvider>()
-                .As<IAuthenticationProvider>()
+            builder.RegisterType<OAuthTokenAuthenticator>()
+                .As<IOAuthTokenAuthenticator>()
                 .SingleInstance();
 
             builder.RegisterType<PersonIdentifiersProvider>()
@@ -259,10 +263,6 @@ namespace EdFi.Ods.Api.Container.Modules
                     .AsSelf()
                     .SingleInstance();
 
-                builder.RegisterGeneric(typeof(GetDeletedResourceModelByIds<,,>))
-                    .AsSelf()
-                    .SingleInstance();
-
                 builder.RegisterGeneric(typeof(ValidateResourceModel<,,,>))
                     .AsSelf()
                     .SingleInstance();
@@ -293,11 +293,6 @@ namespace EdFi.Ods.Api.Container.Modules
 
                 builder.RegisterType<GetBySpecificationPipelineStepsProvider>()
                     .As<IGetBySpecificationPipelineStepsProvider>()
-                    .As<IPipelineStepsProvider>()
-                    .SingleInstance();
-
-                builder.RegisterType<GetDeletedResourceIdsPipelineStepsProvider>()
-                    .As<IGetDeletedResourceIdsPipelineStepsProvider>()
                     .As<IPipelineStepsProvider>()
                     .SingleInstance();
 

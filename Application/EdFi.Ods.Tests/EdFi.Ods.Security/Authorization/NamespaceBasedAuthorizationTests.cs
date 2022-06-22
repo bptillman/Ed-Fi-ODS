@@ -4,13 +4,19 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using EdFi.Common.Extensions;
+using EdFi.Ods.Api.Database.NamingConventions;
 using EdFi.Ods.Common.Extensions;
 using EdFi.Ods.Common.Security;
 using EdFi.Ods.Common.Security.Claims;
 using EdFi.Ods.Api.Security.AuthorizationStrategies.NamespaceBased;
+using EdFi.Ods.Common.Database.NamingConventions;
+using EdFi.Ods.Common.Security.Authorization;
+using EdFi.Ods.Tests._Extensions;
+using FakeItEasy;
 using NUnit.Framework;
 using Shouldly;
 
@@ -44,9 +50,8 @@ namespace EdFi.Ods.Tests.EdFi.Ods.Api.Security.Authorization
             //Act
 
             var exception = Assert.Throws<EdFiSecurityException>(
-                () => strategy.AuthorizeSingleItemAsync(
-                        new List<Claim>(), new EdFiAuthorizationContext(principal, new[] {resource}, action, data), CancellationToken.None)
-                    .WaitSafely());
+                () => strategy.GetAuthorizationStrategyFiltering(
+                        new List<Claim>(), new EdFiAuthorizationContext(new ApiKeyContext(), principal, new[] {resource}, action, data)));
 
             exception.Message.ShouldBe(
                 "Access to the resource could not be authorized because the caller did not have any NamespacePrefix claims ('"
@@ -59,7 +64,7 @@ namespace EdFi.Ods.Tests.EdFi.Ods.Api.Security.Authorization
         public void NamespaceBasedAuthorization_EmptyResourceNamespace()
         {
             //Arrange
-            var strategy = new NamespaceBasedAuthorizationStrategy();
+            var filterDefinitionsFactory = new NamespaceBasedAuthorizationFilterDefinitionsFactory(A.Fake<IDatabaseNamingConvention>());
 
             var claims = new List<Claim>
             {
@@ -78,15 +83,15 @@ namespace EdFi.Ods.Tests.EdFi.Ods.Api.Security.Authorization
             };
 
             //Act
+            var filterDefinition = filterDefinitionsFactory.CreateAuthorizationFilterDefinitions().Single();
 
-            var exception = Assert.Throws<EdFiSecurityException>(
-                () => strategy.AuthorizeSingleItemAsync(
-                        new List<Claim>(), new EdFiAuthorizationContext(principal, new[] {resource}, action, data), CancellationToken.None)
-                    .WaitSafely());
-
-            exception.Message.ShouldBe("Access to the resource item could not be authorized because the Namespace of the resource is empty.");
-
+            var result = filterDefinition.AuthorizeInstance(
+                new EdFiAuthorizationContext(new ApiKeyContext(), principal, new[] { resource }, action, data),
+                new AuthorizationFilterContext());
+            
             //Assert
+            result.Exception.ShouldBeExceptionType<EdFiSecurityException>();
+            result.Exception.Message.ShouldBe("Access to the resource item could not be authorized because the Namespace of the resource is empty.");
         }
 
         [Test]
@@ -112,8 +117,9 @@ namespace EdFi.Ods.Tests.EdFi.Ods.Api.Security.Authorization
             };
 
             //Act
-            strategy.AuthorizeSingleItemAsync(new List<Claim>(), new EdFiAuthorizationContext(principal, new[] {resource}, action, data), CancellationToken.None)
-                .WaitSafely();
+            strategy.GetAuthorizationStrategyFiltering(
+                new List<Claim>(),
+                new EdFiAuthorizationContext(new ApiKeyContext(), principal, new[] { resource }, action, data));
 
             //Assert
         }
@@ -122,7 +128,7 @@ namespace EdFi.Ods.Tests.EdFi.Ods.Api.Security.Authorization
         public void NamespaceBasedAuthorization_MismatchedNamespaces()
         {
             //Arrange
-            var strategy = new NamespaceBasedAuthorizationStrategy();
+            var filterDefinitionsFactory = new NamespaceBasedAuthorizationFilterDefinitionsFactory(A.Fake<IDatabaseNamingConvention>());
 
             var claims = new List<Claim>
             {
@@ -141,14 +147,15 @@ namespace EdFi.Ods.Tests.EdFi.Ods.Api.Security.Authorization
             };
 
             //Act
-            var exception = Assert.Throws<EdFiSecurityException>(
-                () =>
-                    strategy.AuthorizeSingleItemAsync(
-                            new List<Claim>(), new EdFiAuthorizationContext(principal, new[] {resource}, action, data), CancellationToken.None)
-                        .WaitSafely());
+            var filterDefinition = filterDefinitionsFactory.CreateAuthorizationFilterDefinitions().Single();
 
-            exception.Message.ShouldBe("Access to the resource item with namespace 'uri://www.TEST.org/' could not be authorized based on the caller's NamespacePrefix claims: 'uri://ed-fi.org/', 'uri://ed-fi-2.org/'.");
+            var result = filterDefinition.AuthorizeInstance(
+                new EdFiAuthorizationContext(new ApiKeyContext(), principal, new[] { resource }, action, data),
+                new AuthorizationFilterContext());
+
             //Assert
+            result.Exception.ShouldBeExceptionType<EdFiSecurityException>();
+            result.Exception.Message.ShouldBe("Access to the resource item with namespace 'uri://www.TEST.org/' could not be authorized based on the caller's NamespacePrefix claims: 'uri://ed-fi.org/', 'uri://ed-fi-2.org/'.");
         }
 
         [Test]
@@ -170,11 +177,9 @@ namespace EdFi.Ods.Tests.EdFi.Ods.Api.Security.Authorization
 
             //Act
 
-            var exception = Assert.Throws<EdFiSecurityException>(
-                () =>
-                    strategy.AuthorizeSingleItemAsync(
-                            new List<Claim>(), new EdFiAuthorizationContext(principal, new[] {resource}, action, data), CancellationToken.None)
-                        .WaitSafely());
+            var exception = Assert.Throws<EdFiSecurityException>(() => strategy.GetAuthorizationStrategyFiltering(
+                new List<Claim>(),
+                new EdFiAuthorizationContext(new ApiKeyContext(), principal, new[] { resource }, action, data)));
 
             exception.Message.ShouldBe(
                 "Access to the resource could not be authorized because the caller did not have any NamespacePrefix claims ('"

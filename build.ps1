@@ -20,19 +20,43 @@ param(
     [string]
     $BuildCounter = "1",
 
+    [string]
+    $BuildIncrementer = "0",
+
     # .NET project build configuration, defaults to "Release". Options are: Debug, Release.
     [string]
     [ValidateSet("Debug", "Release")]
-    $Configuration = "Release"
+    $Configuration = "Release",
+
+    [bool]
+    $DryRun = $false,
+
+    [string]
+    $NugetApiKey,
+
+    [string]
+    $EdFiNuGetFeed,
+
+    # .Net Project Solution Name
+    [string]
+    $Solution,
+
+    # .Net Project Name
+    [string]
+    $ProjectFile,
+
+    [string]
+    $PackageName,
+
+    [string]
+    $TestFilter
+
 )
 
-$solution = "Application/EdFi.Admin.DataAccess/EdFi.Admin.DataAccess.sln"
-$projectFile = "Application/EdFi.Admin.DataAccess/EdFi.Admin.DataAccess.csproj"
-$newRevision = ([int]$BuildCounter) + 10
+$newRevision = ([int]$BuildCounter) + ([int]$BuildIncrementer)
 $version = "$InformationalVersion.$newRevision"
-$packageName = "EdFi.Suite3.Admin.DataAccess"
 $packageOutput = "$PSScriptRoot/NugetPackages"
-$packagePath = "$packageOutput/$packageName.$version.nupkg"
+$packagePath = "$packageOutput/$PackageName.$version.nupkg"
 
 function Invoke-Execute {
     param (
@@ -83,30 +107,55 @@ function Invoke-Main {
 }
 
 function Clean {
-    Invoke-Execute { dotnet clean $solution -c $Configuration --nologo -v minimal }
+    Invoke-Execute { dotnet clean $Solution -c $Configuration --nologo -v minimal }
 }
 
 function Compile {
     Invoke-Execute {
         dotnet --info
-        dotnet build $solution -c $Configuration -p:AssemblyVersion=$version -p:FileVersion=$version -p:InformationalVersion=$InformationalVersion
+        dotnet build $Solution -c $Configuration -p:AssemblyVersion=$version -p:FileVersion=$version -p:InformationalVersion=$InformationalVersion
     }
 }
 
 function Pack {
-    Invoke-Execute {
-        dotnet pack $projectFile -c $Configuration --output $packageOutput --no-build --verbosity normal -p:VersionPrefix=$version -p:NoWarn=NU5123 -p:PackageId=$packageName
+    if (-not $PackageName){
+        Invoke-Execute {
+            dotnet pack $ProjectFile -c $Configuration --output $packageOutput --no-build --verbosity normal -p:VersionPrefix=$version -p:NoWarn=NU5123
+        }
+    } else {
+        Invoke-Execute {
+            dotnet pack $ProjectFile -c $Configuration --output $packageOutput --no-build --verbosity normal -p:VersionPrefix=$version -p:NoWarn=NU5123 -p:PackageId=$PackageName
+        }
     }
 }
 
 function Publish {
     Invoke-Execute {
-        dotnet nuget push $packagePath -s $env:AZURE_ARTIFACT_URL -k $env:AZURE_ARTIFACT_NUGET_KEY --force-english-output
+
+        if (-not $NuGetApiKey) {
+            throw "Cannot push a NuGet package without providing an API key in the `NuGetApiKey` argument."
+        }
+
+        if (-not $EdFiNuGetFeed) {
+            throw "Cannot push a NuGet package without providing a feed in the `EdFiNuGetFeed` argument."
+        }
+
+        if($DryRun){
+            Write-Host "Dry run enabled, not pushing package."
+        } else {
+            Write-Host "Pushing $packagePath to $EdFiNuGetFeed"
+
+            dotnet nuget push $packagePath --api-key $NuGetApiKey --source $EdFiNuGetFeed
+        }
     }
 }
 
 function Test {
-    Invoke-Execute { dotnet test $solution  -c $Configuration --no-build -v normal }
+    if(-not $TestFilter) {
+        Invoke-Execute { dotnet test $solution  -c $Configuration --no-build -v normal }
+    } else {
+        Invoke-Execute { dotnet test $solution  -c $Configuration --no-build -v normal --filter TestCategory!~"$TestFilter" }
+    }
 }
 
 function Invoke-Build {

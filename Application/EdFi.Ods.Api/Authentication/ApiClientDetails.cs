@@ -3,6 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using EdFi.Admin.DataAccess.Models;
@@ -21,7 +22,7 @@ namespace EdFi.Ods.Api.Authentication
         /// </summary>
         public ApiClientDetails()
         {
-            EducationOrganizationIds = new List<int>();
+            EducationOrganizationIds = Array.Empty<int>();
             NamespacePrefixes = new List<string>();
             Profiles = new List<string>();
             OwnershipTokenIds = new List<short?>();
@@ -33,17 +34,22 @@ namespace EdFi.Ods.Api.Authentication
         public string ApiKey { get; set; }
 
         /// <summary>
-        /// Indicates whether the API bearer token was valid.
+        /// Gets or sets the UTC expiration time of the token.
+        /// </summary>
+        public DateTime ExpiresUtc { get; set; }
+        
+        /// <summary>
+        /// Indicates whether the API bearer token is valid and hasn't expired.
         /// </summary>
         public bool IsTokenValid
         {
-            get => !string.IsNullOrWhiteSpace(ApiKey);
+            get => !string.IsNullOrWhiteSpace(ApiKey) && DateTime.UtcNow < ExpiresUtc;
         }
 
         /// <summary>
         /// Gets or sets the list of Education Organization Ids associated with the API key.
         /// </summary>
-        public IList<int> EducationOrganizationIds { get; set; }
+        public int[] EducationOrganizationIds { get; set; }
 
         /// <summary>
         /// Gets or sets the ApplicationId for the client.
@@ -116,7 +122,8 @@ namespace EdFi.Ods.Api.Authentication
                     ClaimSetName = input.ClaimSetName,
                     IsSandboxClient = input.UseSandbox,
                     StudentIdentificationSystemDescriptor = input.StudentIdentificationSystemDescriptor,
-                    CreatorOwnershipTokenId = input.CreatorOwnershipTokenId
+                    CreatorOwnershipTokenId = input.CreatorOwnershipTokenId,
+                    ExpiresUtc = input.Expiration
                 };
 
                 return dto;
@@ -124,11 +131,11 @@ namespace EdFi.Ods.Api.Authentication
 
             ApiClientDetails LoadAllEducationOrganizationIds(ApiClientDetails dto)
             {
-                tokenClientRecords
+                dto.EducationOrganizationIds = tokenClientRecords
                     .Where(x => x.EducationOrganizationId.HasValue)
                     .Select(x => x.EducationOrganizationId.Value)
                     .Distinct()
-                    .ForEach(x => dto.EducationOrganizationIds.Add(x));
+                    .ToArray();
 
                 return dto;
             }
