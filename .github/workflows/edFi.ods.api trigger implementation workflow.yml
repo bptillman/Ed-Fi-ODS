@@ -14,5 +14,9 @@ jobs:
 
     steps:
     - name: dispatch to implementation repo
-      run: curl -X POST -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ env.EDFI_ODS_TOKEN }}" https://api.github.com/repos/bptillman/Ed-Fi-ODS-Implementation/dispatches -d '{"event_type":"on-demand-test","client_payload":{"integration":true}}'
-      shell: pwsh
+      uses: peter-evans/repository-dispatch@v2
+      with:
+        token: ${{ secrets.EDFI_ODS_TOKEN }}
+        repository: bptillman/Ed-Fi-ODS-Implementation
+        event-type: on-demand-test
+        client-payload: '{"unit":false,"integration":true}'
