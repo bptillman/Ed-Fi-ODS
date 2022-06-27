@@ -1,6 +1,8 @@
 name: EdFi.Ods.Api Trigger workflow in Implementation repo
 
-on: push
+on:
+  pull_request:
+    branches: [main]
 
 env:
   INFORMATIONAL_VERSION: "6.0"
@@ -18,5 +20,5 @@ jobs:
       with:
         token: ${{ secrets.EDFI_ODS_TOKEN }}
         repository: bptillman/Ed-Fi-ODS-Implementation
-        event-type: on-demand-test
+        event-type: on-demand-testtt
         client-payload: '{"unit":false,"integration":true}'
