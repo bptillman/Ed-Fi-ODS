@@ -2,7 +2,8 @@ name: EdFi.Ods.Api.Sdk, TestSdk, SdkGen Trigger workflow in Implementation repo
 
 on:
   push:
-    paths: Utilities\SdkGen\**
+    paths:
+      - 'Utilities\SdkGen\**'
   workflow_dispatch:
     inputs:
       logLevel:
