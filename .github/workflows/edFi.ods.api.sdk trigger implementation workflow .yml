@@ -3,7 +3,7 @@ name: EdFi.Ods.Api.Sdk, TestSdk, SdkGen Trigger workflow in Implementation repo
 on:
   push:
     paths:
-      - 'Utilities\SdkGen\**'
+      - Utilities/SdkGen/**
 
 env:
   INFORMATIONAL_VERSION: "6.0"
