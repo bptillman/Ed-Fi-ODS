@@ -1,0 +1,30 @@
+name: EdFi.Ods.Api.Sdk, TestSdk, SdkGen Trigger workflow in Implementation repo
+
+on:
+  push:
+    paths: Utilities\SdkGen\**
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+
+env:
+  INFORMATIONAL_VERSION: "6.0"
+  BUILD_INCREMENTER: "1"
+  EDFI_ODS_TOKEN: ${{ secrets.EDFI_ODS_TOKEN }}
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Dispatch to Implementation repo
+      uses: peter-evans/repository-dispatch@v2
+      with:
+        token: ${{ secrets.EDFI_ODS_TOKEN }}
+        repository: bptillman/Ed-Fi-ODS-Implementation
+        event-type: on-demand-test
+        client-payload: '{"unit":false,"integration":true}'
