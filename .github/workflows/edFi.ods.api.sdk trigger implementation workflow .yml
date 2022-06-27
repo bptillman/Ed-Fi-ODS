@@ -4,12 +4,6 @@ on:
   push:
     paths:
       - 'Utilities\SdkGen\**'
-  workflow_dispatch:
-    inputs:
-      logLevel:
-        description: 'Log level'
-        required: true
-        default: 'warning'
 
 env:
   INFORMATIONAL_VERSION: "6.0"

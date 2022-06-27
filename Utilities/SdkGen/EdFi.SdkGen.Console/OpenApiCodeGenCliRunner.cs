@@ -22,6 +22,7 @@ namespace EdFi.SdkGen.Console
         private const string Identity = "Identity";
         private const string Java = "java";
         private const string All = "All";
+        private const string Alll = "Alll";
         private readonly ILog _log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly Options _options;
        
