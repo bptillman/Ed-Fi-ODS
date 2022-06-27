@@ -26,5 +26,5 @@ jobs:
       with:
         token: ${{ secrets.EDFI_ODS_TOKEN }}
         repository: bptillman/Ed-Fi-ODS-Implementation
-        event-type: on-demand-test
+        event-type: sdk-test
         client-payload: '{"unit":false,"integration":true}'
