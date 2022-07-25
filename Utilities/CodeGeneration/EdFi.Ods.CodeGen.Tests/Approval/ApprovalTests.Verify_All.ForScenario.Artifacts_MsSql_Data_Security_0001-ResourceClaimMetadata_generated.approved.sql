@@ -223,6 +223,9 @@ INSERT [dbo].[ResourceClaims] ([DisplayName], [ResourceName], [ClaimName], [Pare
 VALUES (N'assessmentScoreRangeLearningStandard', N'assessmentScoreRangeLearningStandard', N'http://ed-fi.org/ods/identity/claims/assessmentScoreRangeLearningStandard', @assessmentMetadataResourceClaimId, @applicationId);
 
 INSERT [dbo].[ResourceClaims] ([DisplayName], [ResourceName], [ClaimName], [ParentResourceClaimId], [Application_ApplicationId])
+VALUES (N'assignmentLateStatusDescriptor', N'assignmentLateStatusDescriptor', N'http://ed-fi.org/ods/identity/claims/assignmentLateStatusDescriptor', @systemDescriptorsResourceClaimId, @applicationId);
+
+INSERT [dbo].[ResourceClaims] ([DisplayName], [ResourceName], [ClaimName], [ParentResourceClaimId], [Application_ApplicationId])
 VALUES (N'attemptStatusDescriptor', N'attemptStatusDescriptor', N'http://ed-fi.org/ods/identity/claims/attemptStatusDescriptor', @systemDescriptorsResourceClaimId, @applicationId);
 
 INSERT [dbo].[ResourceClaims] ([DisplayName], [ResourceName], [ClaimName], [ParentResourceClaimId], [Application_ApplicationId])
@@ -961,6 +964,9 @@ INSERT [dbo].[ResourceClaims] ([DisplayName], [ResourceName], [ClaimName], [Pare
 VALUES (N'studentTitleIPartAProgramAssociation', N'studentTitleIPartAProgramAssociation', N'http://ed-fi.org/ods/identity/claims/studentTitleIPartAProgramAssociation', @relationshipBasedDataResourceClaimId, @applicationId);
 
 INSERT [dbo].[ResourceClaims] ([DisplayName], [ResourceName], [ClaimName], [ParentResourceClaimId], [Application_ApplicationId])
+VALUES (N'submissionStatusDescriptor', N'submissionStatusDescriptor', N'http://ed-fi.org/ods/identity/claims/submissionStatusDescriptor', @systemDescriptorsResourceClaimId, @applicationId);
+
+INSERT [dbo].[ResourceClaims] ([DisplayName], [ResourceName], [ClaimName], [ParentResourceClaimId], [Application_ApplicationId])
 VALUES (N'survey', N'survey', N'http://ed-fi.org/ods/identity/claims/survey', @surveyDomainResourceClaimId, @applicationId);
 
 INSERT [dbo].[ResourceClaims] ([DisplayName], [ResourceName], [ClaimName], [ParentResourceClaimId], [Application_ApplicationId])
@@ -1492,22 +1498,6 @@ SELECT RCAA.ResourceClaimActionId,@AuthorizationStrategyId FROM  [dbo].[Resource
 /* Bootstrap Descriptors and EdOrgs Claims */
 
 SELECT @AuthorizationStrategyId = (SELECT AuthorizationStrategyId FROM [dbo].[AuthorizationStrategies] WHERE AuthorizationStrategyName = 'NoFurtherAuthorizationRequired');
-SELECT @ClaimSetId = (SELECT ClaimSetId FROM [dbo].[ClaimSets] WHERE [ClaimSetName] = 'Ed-Fi Sandbox');
-
-INSERT INTO [dbo].[ClaimSetResourceClaimActionAuthorizationStrategyOverrides]
-    ([ClaimSetResourceClaimActionId]
-    ,[AuthorizationStrategyId])
-
-
-SELECT CSRCAA.ClaimSetResourceClaimActionId,@AuthorizationStrategyId FROM  [dbo].[ClaimSetResourceClaimActions] CSRCAA
-    INNER JOIN [dbo].[ResourceClaims] RC ON  RC.ResourceClaimId =CSRCAA.ResourceClaimId
-    INNER JOIN [dbo].[Actions] A on A.ActionId = CSRCAA.ActionId
-    INNER JOIN [dbo].[ClaimSets] CS on CS.ClaimSetId = CSRCAA.ClaimSetId
-    WHERE  CS.ClaimSetId =@ClaimSetId
-    AND A.ActionName IN ('Create','Read','Update','Delete')
-    AND RC.ResourceName IN ('communityProviderLicense')
-
-
 SELECT @ClaimSetId = (SELECT ClaimSetId FROM [dbo].[ClaimSets] WHERE [ClaimSetName] = 'Bootstrap Descriptors and EdOrgs');
 
 INSERT INTO [dbo].[ClaimSetResourceClaimActionAuthorizationStrategyOverrides]

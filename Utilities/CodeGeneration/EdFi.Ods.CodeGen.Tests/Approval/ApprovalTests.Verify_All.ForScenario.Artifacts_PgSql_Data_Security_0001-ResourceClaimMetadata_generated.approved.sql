@@ -231,6 +231,9 @@ begin
     values ('assessmentScoreRangeLearningStandard', 'assessmentScoreRangeLearningStandard', 'http://ed-fi.org/ods/identity/claims/assessmentScoreRangeLearningStandard', assessmentMetadataResourceClaimId, application_id);
 
     insert into dbo.ResourceClaims (DisplayName, ResourceName, ClaimName, ParentResourceClaimId, Application_ApplicationId)
+    values ('assignmentLateStatusDescriptor', 'assignmentLateStatusDescriptor', 'http://ed-fi.org/ods/identity/claims/assignmentLateStatusDescriptor', systemDescriptorsResourceClaimId, application_id);
+
+    insert into dbo.ResourceClaims (DisplayName, ResourceName, ClaimName, ParentResourceClaimId, Application_ApplicationId)
     values ('attemptStatusDescriptor', 'attemptStatusDescriptor', 'http://ed-fi.org/ods/identity/claims/attemptStatusDescriptor', systemDescriptorsResourceClaimId, application_id);
 
     insert into dbo.ResourceClaims (DisplayName, ResourceName, ClaimName, ParentResourceClaimId, Application_ApplicationId)
@@ -969,6 +972,9 @@ begin
     values ('studentTitleIPartAProgramAssociation', 'studentTitleIPartAProgramAssociation', 'http://ed-fi.org/ods/identity/claims/studentTitleIPartAProgramAssociation', relationshipBasedDataResourceClaimId, application_id);
 
     insert into dbo.ResourceClaims (DisplayName, ResourceName, ClaimName, ParentResourceClaimId, Application_ApplicationId)
+    values ('submissionStatusDescriptor', 'submissionStatusDescriptor', 'http://ed-fi.org/ods/identity/claims/submissionStatusDescriptor', systemDescriptorsResourceClaimId, application_id);
+
+    insert into dbo.ResourceClaims (DisplayName, ResourceName, ClaimName, ParentResourceClaimId, Application_ApplicationId)
     values ('survey', 'survey', 'http://ed-fi.org/ods/identity/claims/survey', surveyDomainResourceClaimId, application_id);
 
     insert into dbo.ResourceClaims (DisplayName, ResourceName, ClaimName, ParentResourceClaimId, Application_ApplicationId)
@@ -1525,19 +1531,6 @@ begin
 select AuthorizationStrategyId into authorization_strategy_id
 from dbo.AuthorizationStrategies
 where AuthorizationStrategyName = 'NoFurtherAuthorizationRequired';
-
-select ClaimSetId INTO claim_set_id from dbo.ClaimSets where ClaimSetName = 'Ed-Fi Sandbox';
-
-insert into dbo.ClaimSetResourceClaimActionAuthorizationStrategyOverrides
-    (ClaimSetResourceClaimActionId
-    ,AuthorizationStrategyId)
-select CSRCAA.ClaimSetResourceClaimActionId,authorization_strategy_id FROM  dbo.ClaimSetResourceClaimActions CSRCAA
-    inner join dbo.ResourceClaims RC on  RC.ResourceClaimId =CSRCAA.ResourceClaimId
-    inner join dbo.Actions A on A.ActionId = CSRCAA.ActionId
-    inner join dbo.ClaimSets CS on CS.ClaimSetId = CSRCAA.ClaimSetId
-    where CS.ClaimSetId = claim_set_id
-    and A.ActionName in ('Create','Read','Update','Delete')
-    and RC.ResourceName in ('communityProviderLicense');
 
 select ClaimSetId INTO claim_set_id from dbo.ClaimSets where ClaimSetName = 'Bootstrap Descriptors and EdOrgs';
 

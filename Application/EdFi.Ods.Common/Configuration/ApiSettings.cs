@@ -50,7 +50,18 @@ namespace EdFi.Ods.Common.Configuration
 
         public bool? UseReverseProxyHeaders { get; set; }
 
+        public string OverrideForForwardingHostServer { get; set; }
+
+        public int? OverrideForForwardingHostPort { get; set; }
+
+        public ReverseProxySettings GetReverseProxySettings()
+        {
+            return new ReverseProxySettings(this.UseReverseProxyHeaders, this.OverrideForForwardingHostServer, this.OverrideForForwardingHostPort);
+        }
+
         public string PathBase { get; set; }
+
+        public CacheSettings Caching { get; set; } = new CacheSettings();
 
         public DatabaseEngine GetDatabaseEngine() => _databaseEngine.Value;
 
