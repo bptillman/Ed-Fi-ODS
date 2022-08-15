@@ -48,7 +48,10 @@ namespace EdFi.LoadTools.Engine
     public interface IDestructiveTestConfiguration
     {
         string NamespacePrefix { get; }
-        int? ParentEdOrgId { get; }
+
+        IReadOnlyDictionary<string, int> EducationOrganizationIdOverrides { get; }
+
+        IEnumerable<string> UnifiedProperties { get; }
     }
 
     public interface IHashCacheConfiguration

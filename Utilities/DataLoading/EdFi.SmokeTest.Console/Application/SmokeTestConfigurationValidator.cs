@@ -5,6 +5,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using EdFi.Common.Configuration;
 using EdFi.LoadTools.SmokeTest;
@@ -47,12 +48,26 @@ namespace EdFi.SmokeTest.Console.Application
                    Uri.IsWellFormedUriString(_configuration.NamespacePrefix, UriKind.Absolute);
         }
 
+        private bool ValidEducationOrganizationIdOverrides
+        {
+            get => _configuration.TestSet != TestSet.DestructiveSdk ||
+                   (_configuration.EducationOrganizationIdOverrides != null &&
+                    _configuration.EducationOrganizationIdOverrides.Any() && !_configuration.EducationOrganizationIdOverrides
+                        .GroupBy(kv => kv.Value).Any(g => g.Count() > 1));
+        }
+
+        private bool ValidUnifiedProperties
+        {
+            get => _configuration.TestSet != TestSet.DestructiveSdk ||
+                   (_configuration.UnifiedProperties != null && _configuration.UnifiedProperties.Any());
+        }
+
         public string ErrorText { get; private set; }
 
         public bool IsValid()
         {
             var isValid = ValidApiUrl && ValidOAuthUrl && ValidMetadataUrl && ValidSdkLibraryPath &&
-                          ValidNamespacePrefix;
+                          ValidNamespacePrefix && ValidEducationOrganizationIdOverrides && ValidUnifiedProperties;
 
             if (_configuration.ApiMode == ApiMode.YearSpecific)
             {
@@ -94,6 +109,16 @@ namespace EdFi.SmokeTest.Console.Application
             if (!ValidNamespacePrefix)
             {
                 sb.AppendLine("n:namespace is not a valid URI");
+            }
+
+            if (!ValidEducationOrganizationIdOverrides)
+            {
+                sb.AppendLine("EducationOrganizationIdOverrides is required and all its ids must be distinct.");
+            }
+
+            if (!ValidUnifiedProperties)
+            {
+                sb.AppendLine("UnifiedProperties is required");
             }
 
             if (_configuration.ApiMode == ApiMode.YearSpecific && !_configuration.SchoolYear.HasValue)

@@ -4,7 +4,9 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using EdFi.Common.Configuration;
 using EdFi.LoadTools;
@@ -83,8 +85,10 @@ namespace EdFi.SmokeTest.Console.Application
         }
 
         public string NamespacePrefix { get; set; }
+        
+        public IReadOnlyDictionary<string, int> EducationOrganizationIdOverrides { get; set; }
 
-        public int? ParentEdOrgId { get; set; }
+        public IEnumerable<string> UnifiedProperties { get; set; }
 
         string IOAuthSessionToken.SessionToken { get; set; }
 
@@ -134,7 +138,9 @@ namespace EdFi.SmokeTest.Console.Application
                 OAuthSecret = configuration.GetValue<string>("OdsApi:Secret"),
                 SchoolYear = configuration.GetValue<int?>("OdsApi:SchoolYear"),
                 NamespacePrefix = configuration.GetValue<string>("NamespacePrefix"),
-                ParentEdOrgId = configuration.GetValue<int?>("ParentEdOrgId"),
+                EducationOrganizationIdOverrides =
+                    configuration.GetSection("EducationOrganizationIdOverrides").Get<IReadOnlyDictionary<string, int>>(),
+                UnifiedProperties = configuration.GetSection("UnifiedProperties").Get<IEnumerable<string>>(),
                 SdkLibraryPath = configuration.GetValue<string>("SdkLibraryPath"),
                 TestSet = testSet,
                 ApiMode = apiMode
